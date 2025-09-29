@@ -1,0 +1,18 @@
+# Virtual environments
+venv*/
+myenv/
+env/
+
+# Python
+__pycache__/
+*.pyc
+
+# Environment variables - CRITICAL for security
+.env
+*.env
+
+# OS files
+.DS_Store
+
+# Streamlit
+.streamlit/
