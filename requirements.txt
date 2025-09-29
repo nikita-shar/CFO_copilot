@@ -1,15 +1,6 @@
-# LLM Provider
-openai==1.54.3
-
-# UI and Visualization
-streamlit==1.40.0
-plotly==5.24.1
-
-# Data Processing
-pandas==2.2.3
-
-# Configuration
-python-dotenv==1.0.1
-
-# Optional: Anthropic (only if you want to use Claude instead)
-# anthropic==0.39.0
+openai==1.109.1
+pandas==2.3.2
+plotly==6.3.0
+pytest==8.4.2
+python-dotenv==1.1.1
+streamlit==1.50.0
