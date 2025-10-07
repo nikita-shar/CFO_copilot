@@ -5,7 +5,7 @@ These tests verify that the AI agent can properly interact with OpenAI's API.
 
 import pytest
 import os
-from openai_cfo_agent import OpenAICFOAgent
+from agent.openai_cfo_agent import OpenAICFOAgent
 
 
 class TestAgentInitialization:

@@ -1,7 +1,7 @@
 import streamlit as st
 import plotly.graph_objects as go
 import os
-from openai_cfo_agent import OpenAICFOAgent  # Only import OpenAI version
+from agent.openai_cfo_agent import OpenAICFOAgent 
 
 st.cache_data.clear()
 
@@ -92,13 +92,11 @@ def create_chart(config):
         return None
     
 
-# Page configuration
 st.set_page_config(
     page_title="CFO AI Assistant",
     layout="wide"
 )
 
-# Initialize session state
 if 'agent' not in st.session_state:
     api_key = os.getenv('OPENAI_API_KEY')
     if not api_key:
@@ -118,11 +116,9 @@ if 'agent' not in st.session_state:
 if 'chat_history' not in st.session_state:
     st.session_state.chat_history = []
 
-# Title and description
 st.title("CFO AI Assistant")
 st.markdown("Ask me anything about your company's financials! *Powered by OpenAI GPT-4*")
 
-# Sidebar with example questions
 with st.sidebar:
     st.header("Example Questions")
     
@@ -236,7 +232,7 @@ if prompt := st.chat_input("Ask a financial question..."):
                     "content": error_msg
                 })
 
-# Footer
+
 st.divider()
 st.markdown(
     """
