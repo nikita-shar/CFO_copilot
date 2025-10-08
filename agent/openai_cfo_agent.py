@@ -16,7 +16,6 @@ class OpenAICFOAgent:
         self.current_month = datetime.now().month
         self.conversation_history = []
         
-        # Define tools/functions that the LLM can call
         self.tools = [
             {
                 "type": "function",
@@ -165,7 +164,6 @@ class OpenAICFOAgent:
                 'chart_config': dict  # Suggested chart configuration
             }
         """
-        # System message with context
         system_message = f"""You are a financial analyst assistant. Today's date is {datetime.now().strftime('%B %d, %Y')} (month {self.current_month}, year {self.current_year}).
 
 When users ask questions without specifying dates:
@@ -184,12 +182,10 @@ IMPORTANT FORMATTING RULES:
 
 Provide clear, conversational answers based on the financial data you retrieve."""
 
-        # Build messages
         messages = [{"role": "system", "content": system_message}]
         messages.extend(self.conversation_history)
         messages.append({"role": "user", "content": user_question})
         
-        # Initial API call
         response = self.client.chat.completions.create(
             model="gpt-4o",  # or "gpt-4-turbo" or "gpt-3.5-turbo"
             messages=messages,
@@ -197,11 +193,9 @@ Provide clear, conversational answers based on the financial data you retrieve."
             tool_choice="auto"
         )
         
-        # Handle tool calls
         collected_data = {}
         response_message = response.choices[0].message
         
-        # Process function calls iteratively
         while response_message.tool_calls:
             messages.append(response_message)
             
@@ -209,11 +203,9 @@ Provide clear, conversational answers based on the financial data you retrieve."
                 function_name = tool_call.function.name
                 function_args = json.loads(tool_call.function.arguments)
                 
-                # Execute the function
                 result = self.process_tool_call(function_name, function_args)
                 collected_data[function_name] = result
                 
-                # Add function response to messages
                 messages.append({
                     "role": "tool",
                     "tool_call_id": tool_call.id,
@@ -221,7 +213,6 @@ Provide clear, conversational answers based on the financial data you retrieve."
                     "content": json.dumps(result)
                 })
             
-            # Get next response
             response = self.client.chat.completions.create(
                 model="gpt-4o",
                 messages=messages,
@@ -230,16 +221,13 @@ Provide clear, conversational answers based on the financial data you retrieve."
             )
             response_message = response.choices[0].message
         
-        # Extract final answer
         final_answer = response_message.content or ""
 
-        # Update conversation history (keep last 10 messages to control context)
         self.conversation_history.append({"role": "user", "content": user_question})
         self.conversation_history.append({"role": "assistant", "content": final_answer})
         if len(self.conversation_history) > 20:  # Keep last 10 exchanges
             self.conversation_history = self.conversation_history[-20:]
         
-        # Parse chart configuration from the response
         chart_config = self.extract_chart_config(final_answer, collected_data)
         
         return {
@@ -252,7 +240,6 @@ Provide clear, conversational answers based on the financial data you retrieve."
         """
         Extract or generate chart configuration from the LLM's response and data.
         """
-        # Try to find JSON chart_config in the answer
         try:
             if "chart_config" in answer.lower() or "{" in answer:
                 start = answer.find("{")
@@ -265,11 +252,9 @@ Provide clear, conversational answers based on the financial data you retrieve."
         except:
             pass
         
-        # Generate default chart config based on the data
         if not data:
             return None
         
-        # Auto-generate based on function called
         first_func = list(data.keys())[0]
         first_data = list(data.values())[0]
         

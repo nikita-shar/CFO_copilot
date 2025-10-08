@@ -134,13 +134,12 @@ with st.sidebar:
     
     for i, example in enumerate(examples):
         if st.button(example, key=f"example_{i}", use_container_width=True):
-            # Trigger the query
             st.session_state.pending_query = example
             st.rerun()
     
     st.divider()
     
-    # Provider info
+
     st.info("🤖 Using: **OpenAI GPT-4**")
     
     if st.button("🔄 Reset Conversation", use_container_width=True):
@@ -148,23 +147,20 @@ with st.sidebar:
         st.session_state.chat_history = []
         st.rerun()
 
-# Handle pending query from sidebar button
+
 if 'pending_query' in st.session_state:
     prompt = st.session_state.pending_query
     del st.session_state.pending_query
     
-    # Add user message to chat
     st.session_state.chat_history.append({
         "role": "user",
         "content": prompt
     })
     
-    # Get response from agent
     with st.spinner("Analyzing..."):
         try:
             response = st.session_state.agent.ask(prompt)
             
-            # Add assistant response to chat history
             st.session_state.chat_history.append({
                 "role": "assistant",
                 "content": response["answer"],
@@ -178,46 +174,37 @@ if 'pending_query' in st.session_state:
                 "content": error_msg
             })
 
-# Display chat history
 for message in st.session_state.chat_history:
     with st.chat_message(message["role"]):
         st.text(message["content"])
-        
-        # Display chart if available
+
         if message["role"] == "assistant" and "chart" in message and message["chart"]:
             fig = create_chart(message["chart"])
             if fig:
                 st.plotly_chart(fig, use_container_width=True)
 
-# User input
 if prompt := st.chat_input("Ask a financial question..."):
-    # Add user message to chat
     st.session_state.chat_history.append({
         "role": "user",
         "content": prompt
     })
     
-    # Display user message immediately
     with st.chat_message("user"):
         st.text(prompt)
-    
-    # Get response from agent
+
     with st.chat_message("assistant"):
         with st.spinner("Analyzing..."):
             try:
                 response = st.session_state.agent.ask(prompt)
                 
-                # Display answer
                 st.text(response["answer"])
                 
-                # Display chart if configuration exists
                 chart_config = response.get("chart_config")
                 if chart_config:
                     fig = create_chart(chart_config)
                     if fig:
                         st.plotly_chart(fig, use_container_width=True)
                 
-                # Add assistant response to chat history
                 st.session_state.chat_history.append({
                     "role": "assistant",
                     "content": response["answer"],
